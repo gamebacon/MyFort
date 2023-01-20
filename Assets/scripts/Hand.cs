@@ -11,6 +11,8 @@ namespace DefaultNamespace
         [SerializeField] private Animator _animator;
         [SerializeField] private IKControl _ikControl;
 
+        private float attachCooldown = 1.7f;
+
         private bool canAttack = true;
         
 
@@ -50,7 +52,7 @@ namespace DefaultNamespace
         {
             canAttack = false;
             _animator.SetTrigger("attack");
-            Invoke(nameof(ResetAttack), 1f);
+            Invoke(nameof(ResetAttack), attachCooldown);
                 
             if(Physics.Raycast(_cam.transform.position, _cam.transform.forward, out RaycastHit hit, 2, _mask))
             {

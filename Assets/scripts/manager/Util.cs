@@ -19,6 +19,12 @@ namespace DefaultNamespace
             return new Vector3(Random.Range(-xRange, xRange), 0, Random.Range(-zRange, zRange));
         }
         
+        public static Vector3 randomScale(float min = 0f, float max = 1f)
+        {
+            return new Vector3(Random.Range(min, max), Random.Range(min, max), Random.Range(min, max));
+        }
+        
+        
         
     }
 }

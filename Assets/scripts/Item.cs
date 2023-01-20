@@ -74,7 +74,8 @@ namespace DefaultNamespace
     
     public enum ItemType
     {
-        Wood
+        Wood,
+        Stone
     }
 
     public enum Tag

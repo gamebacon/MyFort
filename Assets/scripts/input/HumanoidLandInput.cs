@@ -12,7 +12,9 @@ public class HumanoidLandInput : MonoBehaviour
     public bool MouseLeft { get; private set; }
     
     public bool InvertMouseY { get; private set; } = true;
+    
     public bool ChangeCameraWasPressThisFrame { get; private set; } = true;
+    public bool LeftMouseWasPressThisFrame { get; private set; } = true;
     
     private bool MovePressed;
 
@@ -83,5 +85,6 @@ public class HumanoidLandInput : MonoBehaviour
     private void Update()
     {
         ChangeCameraWasPressThisFrame = _input.HumanoidLand.ChangeCamera.WasPressedThisFrame();
+        LeftMouseWasPressThisFrame = _input.HumanoidLand.MouseLeft.WasPressedThisFrame();
     }
 }
