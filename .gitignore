@@ -1,4 +1,11 @@
 .idea/
-Temp/
-obj/
+Build/
+builds/
+Library/
 Logs/
+obj/
+Temp/
+UserSettings/
+*.csproj
+*.sln
+.DS_Store
