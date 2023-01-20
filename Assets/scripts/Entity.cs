@@ -1,9 +1,7 @@
 ﻿using System;
 using TMPro;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class Entity : MonoBehaviour
 {
@@ -42,10 +40,9 @@ public class Entity : MonoBehaviour
         float percentageLeft = entityValues.health / entityValues.maxHealth;
 
         EntityValues.UI ui = entityValues.ui;
-        if (ui.healthBarSlider && ui.healthBarPercentageText)
+        if (ui.healthBarSlider)
         {
             ui.healthBarSlider.value = percentageLeft;
-            ui.healthBarPercentageText.text = $"{percentageLeft * 100:F0}%";
         }
         
 
@@ -69,7 +66,6 @@ public class Entity : MonoBehaviour
         {
             public TextMeshProUGUI nameText;
             public Slider healthBarSlider;
-            public TextMeshProUGUI healthBarPercentageText;
         }
     }
 }

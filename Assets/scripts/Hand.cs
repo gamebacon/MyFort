@@ -11,7 +11,7 @@ namespace DefaultNamespace
         [SerializeField] private Animator _animator;
         [SerializeField] private IKControl _ikControl;
 
-        private float attachCooldown = 1.7f;
+        private float attachCooldown = 0.3f;
 
         private bool canAttack = true;
         
@@ -26,7 +26,6 @@ namespace DefaultNamespace
 
         private void Update()
         {
-            
             if (_heldItem)
             {
                 if (!_input.MouseLeft)
@@ -44,6 +43,9 @@ namespace DefaultNamespace
                 else if(canAttack)
                 {
                     Attack();
+                } else if (!canAttack)
+                {
+                    print("Cant attac!!!!");
                 }
             }
         }
@@ -71,6 +73,7 @@ namespace DefaultNamespace
         
         public void ResetAttack()
         {
+            print("rest attack");
             canAttack = true;
         }
 

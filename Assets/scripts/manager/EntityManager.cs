@@ -1,33 +1,36 @@
 using System;
 using DefaultNamespace;
+using Microsoft.Win32.SafeHandles;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
-using Vector3 = System.Numerics.Vector3;
 
-public class EntityManager : MonoBehaviour
+namespace manager
 {
-
-    [SerializeField] private GameObject npcPrefab;
-    [SerializeField] private GameObject treePrefab;
-    [SerializeField] private GameObject rockPrefab;
-    
-    [FormerlySerializedAs("npcContainer")] [SerializeField] private Transform entityContainer;
-    
-    void Start()
+    public class EntityManager : MonoBehaviour
     {
-        Spawn(npcPrefab, 100);
-        Spawn(treePrefab, 100, 5);
-        Spawn(rockPrefab, 50, 1, 2f);
-    }
 
-    private void Spawn(GameObject prefab, int amount, float sizeFactor = 1, float sizeTresHold = .2f)
-    {
-        for (int i = 0; i < amount; i++)
+        [SerializeField] private GameObject npcPrefab;
+        [SerializeField] private GameObject treePrefab;
+        [SerializeField] private GameObject rockPrefab;
+    
+        [FormerlySerializedAs("npcContainer")] [SerializeField] private Transform entityContainer;
+    
+        void Start()
         {
-            GameObject gameObject = Instantiate(prefab, Util.randomLocation(), Quaternion.Euler(0, Random.Range(0, 360), 0), entityContainer);
-            gameObject.transform.localScale *= Random.Range(Math.Max(0.1f, 1 - sizeFactor), 1 + sizeTresHold) * sizeFactor;
+            Spawn(npcPrefab, 100);
+            Spawn(treePrefab, 100, 1, 10f);
+            Spawn(rockPrefab, 50, .4f, 2f);
         }
-    }
+
+        private void Spawn(GameObject prefab, int amount, float minSIze = 1f, float maxSize = 1f)
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                GameObject gameObject = Instantiate(prefab, Util.randomLocation(), Quaternion.Euler(0, Random.Range(0, 360), 0), entityContainer);
+                gameObject.transform.localScale *= Random.Range(minSIze, maxSize);
+            }
+        }
     
+    }
 }

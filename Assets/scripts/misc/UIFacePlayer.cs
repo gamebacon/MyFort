@@ -19,7 +19,7 @@ public class UIFacePlayer : MonoBehaviour
     {
         double distanceSquared = Util.DistanceSquared(transform.position, player.transform.position);
 
-        if (distanceSquared > 100)
+        if (distanceSquared > 1_500)
         {
             return;
         }
