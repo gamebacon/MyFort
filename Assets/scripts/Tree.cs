@@ -2,7 +2,7 @@
 using DefaultNamespace;
 using UnityEngine;
 
-public class Tree : Entity
+public class Tree : Resource 
 {
 
     [SerializeField] private GameObject[] branches;

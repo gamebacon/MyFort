@@ -43,10 +43,7 @@ namespace DefaultNamespace
                 else if(canAttack)
                 {
                     Attack();
-                } else if (!canAttack)
-                {
-                    print("Cant attac!!!!");
-                }
+                } 
             }
         }
 
@@ -60,8 +57,6 @@ namespace DefaultNamespace
             {
 
                 Entity entity = hit.collider.GetComponentInParent<Entity>();
-                print("hit: " + hit.collider.gameObject.name);
-                
                     
                 if (entity)
                 {
@@ -73,7 +68,6 @@ namespace DefaultNamespace
         
         public void ResetAttack()
         {
-            print("rest attack");
             canAttack = true;
         }
 

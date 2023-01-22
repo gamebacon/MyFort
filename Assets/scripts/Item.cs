@@ -74,6 +74,7 @@ namespace DefaultNamespace
     
     public enum ItemType
     {
+        None,
         Wood,
         Stone
     }

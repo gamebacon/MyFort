@@ -1,6 +1,8 @@
 ﻿using System;
 using DefaultNamespace;
+using manager;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,44 +12,72 @@ public class LivingEntity : Entity
     [SerializeField] private LivingEntityValues livingEntityValues; 
     [SerializeField] private Animator _animator; 
     public Vector3 targetLocation;
-    public Vector3 targetDirection;
     
     private Rigidbody _rb;
+    public float viewDistance { get; private set; }
+    
+    public ItemType resourceOfInterest;
+
+    private EntityManager _entityManager;
+
+    private Resource targetResource;
 
     private void OnEnable()
     {
+        _entityManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<EntityManager>();
+        
         _rb = GetComponent<Rigidbody>();
-        _animator.speed = livingEntityValues.speedMultiplier * 0.1f;
         onDeateEvent += onDeath;
-
         DoSomethingNew();
+
+        viewDistance = 15f;
     }
 
     private void Update()
     {
         switch (action)
         {
-            case Action.Walk: 
-            case Action.Run:
+            case Action.Roam: 
                 Move();
                 break;
             default: return;
         }
+
+        if (!targetResource && resourceOfInterest != ItemType.None)
+        {
+            SeekResource();
+        }
+        
     }
 
+    void SeekResource()
+    {
+        Resource resource = _entityManager.FindResourceInRange(transform, resourceOfInterest, viewDistance);
+        if (resource == null)
+        {
+            return;
+        }
+        
+        targetResource = resource;
+        targetLocation = resource.transform.position;
+    }
+    
     void Move()
     {
         double dist = Vector3.Distance(transform.position, targetLocation);
 
-        if(dist <= 2f)
+        if(dist <= .5f)
         {
             livingEntityValues.UI.distanceText.text = "";
             DoSomethingNew();
         }
         else
         {
-            Vector3 force = targetDirection * livingEntityValues.speedMultiplier; 
+            Vector3 targetDirection = (targetLocation - transform.position).normalized;
+            float speed = 12 * livingEntityValues.speedMultiplier;
+            Vector3 force = targetDirection * speed;
             livingEntityValues.UI.distanceText.text = $"{dist:F0}m";
+            transform.LookAt(targetLocation);
             _rb.AddForce(force);
         }
     }
@@ -56,46 +86,68 @@ public class LivingEntity : Entity
     public enum Action
     {
         Idle,
-        Walk,
-        Run,
+        Roam,
+        Dead,
     }
 
-    void DoSomethingNew()
+
+    void FindResource()
     {
+        resourceOfInterest = Util.getRandomItemType(true);
+
+        if (resourceOfInterest == ItemType.None)
+        {
+            return;
+        }
+
+        Entity resource = _entityManager.FindResourceInRange(transform, resourceOfInterest, viewDistance);
+    }
+    
+    
+    void DoSomethingNew()
+     {
         Action newAction = decideNewAction();
+        
+        FindResource();
         
         switch (newAction)
         {
-            case Action.Walk:
-            case Action.Run:
+            case Action.Roam:
                 targetLocation = Util.randomLocation();
-                targetDirection = (targetLocation - transform.position).normalized;
-                transform.LookAt(targetLocation);
-                
-                livingEntityValues.speedMultiplier = newAction == Action.Run ? 25 : 20;
                 break;
             case Action.Idle:
-                livingEntityValues.speedMultiplier = .3f;
                 Idle(Random.Range(10f, 30f));
                 break;
         }
         
-        _animator.SetBool("run", newAction == Action.Run);
-        _animator.SetBool("walk", newAction == Action.Walk);
+        // _animator.SetBool("run", newAction == Action.Run);
+        _animator.SetBool("walk", newAction == Action.Roam);
         _animator.SetBool("idle", newAction == Action.Idle);
         
-        _animator.SetFloat("speed", newAction == Action.Run ? 10f : newAction == Action.Walk ? 7f : 3f);
+        // _animator.SetFloat("speed", newAction == Action.Run ? 1.6f : newAction == Action.Walk ? 1.2f : 1f);
         
-        livingEntityValues.UI.statusText.text = newAction.ToString();
 
         action = newAction;
+        UpdateStatusText();
+    }
+
+    private void UpdateStatusText()
+    {
+        string status = action.ToString();
+
+        if (resourceOfInterest != ItemType.None)
+        {
+            status = $"looking for {resourceOfInterest}";
+        }
+            
+        livingEntityValues.UI.statusText.text = status;
     }
 
     void Idle(float time)
     {
         Invoke(nameof(DoSomethingNew), time);
     }
-
+    
 
     private Action decideNewAction()
     {
@@ -103,41 +155,47 @@ public class LivingEntity : Entity
 
         if (num > 90)
         {
-            return Action.Run;
-        } else if (num > 50)
-        {
-            return Action.Walk;
+            return Action.Idle;
         }
         else
         {
-            return Action.Idle;
+            return Action.Roam;
         }
     }
     
     private void onDeath()
     {
+        action = Action.Dead;
         onDeateEvent -= onDeateEvent;
         _animator.SetTrigger("death");
         Destroy(gameObject, 5);
     } 
     
-    void OnDrawGizmosSelected () {
+    void OnDrawGizmos() {
         if (Application.isPlaying) {
-            
-            Gizmos.color = Color.white;
-            
-            if (action == Action.Run) {
-                Gizmos.DrawLine(transform.position, targetLocation);
-            }
 
-            if (action == Action.Idle) {
-                Gizmos.color = Color.green;
-                Gizmos.DrawSphere(transform.position, 3.5f);
+            if (action == Action.Roam)
+            {
+                Handles.Disc(
+                    Quaternion.identity,
+                    targetLocation,
+                    Vector2.up,
+                    1, false, 1f
+                );
             }
+            
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, transform.position + transform.forward * viewDistance);
+
+            Handles.Disc(
+                Quaternion.identity,
+                transform.position,
+                Vector2.up,
+                viewDistance, false, 1f
+            );
+            
         }
     }
-    
-    
 
     [Serializable]
     class LivingEntityValues

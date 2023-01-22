@@ -4,7 +4,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Rock : Entity 
+public class Rock : Resource 
 {
     private float size;
 

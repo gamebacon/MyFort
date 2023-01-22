@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.InputSystem.Interactions;
 using Random = UnityEngine.Random;
 
 namespace DefaultNamespace
@@ -23,8 +24,15 @@ namespace DefaultNamespace
         {
             return new Vector3(Random.Range(min, max), Random.Range(min, max), Random.Range(min, max));
         }
-        
-        
+
+
+        public static ItemType getRandomItemType(bool canBeNone = false)
+        {
+            Array resources = Enum.GetValues(typeof(ItemType));
+            int randomIndex = Random.Range(canBeNone ? 0 : 1, resources.Length);
+            Debug.Log("Random index: " + randomIndex);
+            return (ItemType) resources.GetValue(randomIndex);
+        }
         
     }
 }

@@ -1,8 +1,7 @@
 using System;
 using DefaultNamespace;
-using Microsoft.Win32.SafeHandles;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace manager
@@ -13,14 +12,15 @@ namespace manager
         [SerializeField] private GameObject npcPrefab;
         [SerializeField] private GameObject treePrefab;
         [SerializeField] private GameObject rockPrefab;
-    
-        [FormerlySerializedAs("npcContainer")] [SerializeField] private Transform entityContainer;
-    
+        [SerializeField] private Transform entityContainer;
+        [SerializeField] private LayerMask _resourceMask;
+        
+        
         void Start()
         {
-            Spawn(npcPrefab, 100);
-            Spawn(treePrefab, 100, 1, 10f);
-            Spawn(rockPrefab, 50, .4f, 2f);
+            Spawn(npcPrefab, 1);
+            Spawn(treePrefab, 10, 1, 10f);
+            Spawn(rockPrefab, 10, .4f, 2f);
         }
 
         private void Spawn(GameObject prefab, int amount, float minSIze = 1f, float maxSize = 1f)
@@ -31,6 +31,46 @@ namespace manager
                 gameObject.transform.localScale *= Random.Range(minSIze, maxSize);
             }
         }
-    
+
+        public Type getResourceOrigin(ItemType type)
+        {
+            switch (type)
+            {
+                case ItemType.Wood:
+                 return typeof(Tree);
+                case ItemType.Stone:
+                 return typeof(Rock);
+                
+                default: 
+                    throw new Exception("No resource origin for " + type);
+            }
+        }
+
+        public Resource FindResourceInRange(Transform origin, ItemType type, float range)
+        {
+            RaycastHit[] hits = Physics.SphereCastAll(origin.position, range, origin.forward,.1f, _resourceMask);
+            
+            
+            foreach(RaycastHit hit in hits)
+            {
+                GameObject gameObject = hit.collider.gameObject;
+                Resource resource = gameObject.GetComponentInParent<Resource>();
+                if (resource.getDrop() == type)
+                {
+                    print("Found : " + gameObject.name + " - " + hit.distance + ", type: " + resource.GetType() + " - interest: " + type);
+                    return resource;
+                }
+            }
+
+            return null;
+        }
+
+        public enum EntityType
+        {
+            NPC,
+            Tree,
+            Rock
+        }
+
     }
 }
